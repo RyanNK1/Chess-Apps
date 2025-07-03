@@ -1,10 +1,10 @@
 $(document).ready(function () {
   const board = $('#game');
   const turnDisplay = $('#turn');
+  const cli = $('#cli');
   let selectedCell = null;
   let turn = 'white';
 
-  // Unique keys for internal logic, but only show the symbol
   const pieces = {
     '♜1': [0, 0], '♞1': [1, 0], '♝1': [2, 0], '♛': [3, 0], '♚': [4, 0], '♝2': [5, 0], '♞2': [6, 0], '♜2': [7, 0],
     '♟1': [0, 1], '♟2': [1, 1], '♟3': [2, 1], '♟4': [3, 1], '♟5': [4, 1], '♟6': [5, 1], '♟7': [6, 1], '♟8': [7, 1],
@@ -17,12 +17,31 @@ $(document).ready(function () {
   }
 
   function clearHighlights() {
-    $('.cell').removeClass('highlight');
+    $('.cell').removeClass('highlight shake-little neongreen_txt');
   }
 
   function switchTurn() {
     turn = turn === 'white' ? 'black' : 'white';
     turnDisplay.text(`It's ${turn.charAt(0).toUpperCase() + turn.slice(1)}'s Turn!`);
+    turnDisplay.addClass('turnhighlight');
+    setTimeout(() => turnDisplay.removeClass('turnhighlight'), 1000);
+  }
+
+  function coordToId(coord) {
+    const file = coord[0].toLowerCase().charCodeAt(0) - 97;
+    const rank = 8 - parseInt(coord[1]);
+    return `${file}_${rank}`;
+  }
+
+  function resetBoard() {
+    $('.cell').text('');
+    for (const [pieceKey, positions] of Object.entries(pieces)) {
+      const symbol = pieceKey[0];
+      const [x, y] = positions;
+      $(`#${x}_${y}`).text(symbol);
+    }
+    turn = 'white';
+    turnDisplay.text("It's Whites Turn!");
   }
 
   // Create board
@@ -35,14 +54,8 @@ $(document).ready(function () {
     }
   }
 
-  // Place pieces
-  for (const [pieceKey, positions] of Object.entries(pieces)) {
-    const symbol = pieceKey[0]; // Only show the symbol
-    const [x, y] = positions;
-    $(`#${x}_${y}`).text(symbol);
-  }
+  resetBoard();
 
-  // Handle clicks
   $('.cell').click(function () {
     const clickedPiece = $(this).text();
     const clickedColor = getColor(clickedPiece);
@@ -50,20 +63,58 @@ $(document).ready(function () {
     if (selectedCell === null) {
       if (clickedPiece && clickedColor === turn) {
         selectedCell = $(this);
-        $(this).addClass('highlight');
+        $(this).addClass('highlight shake-little neongreen_txt');
       }
     } else {
-      if ($(this)[0] !== selectedCell[0]) {
-        $(this).text(selectedCell.text());
+      const selectedPiece = selectedCell.text();
+      const selectedColor = getColor(selectedPiece);
+
+      if ($(this)[0] === selectedCell[0]) {
+        clearHighlights();
+        selectedCell = null;
+      } else if (!clickedPiece || clickedColor !== selectedColor) {
+        $(this).text(selectedPiece);
         selectedCell.text('');
         clearHighlights();
         selectedCell = null;
         switchTurn();
       } else {
         clearHighlights();
-        selectedCell = null;
+        selectedCell = $(this);
+        $(this).addClass('highlight shake-little neongreen_txt');
       }
     }
   });
+
+  cli.on('keypress', function (e) {
+    if (e.which === 13) {
+      const input = cli.val().trim().toLowerCase();
+      const parts = input.split(' ');
+
+      if (parts[0] === 'move' && parts.length === 3) {
+        const fromId = coordToId(parts[1]);
+        const toId = coordToId(parts[2]);
+        const fromCell = $(`#${fromId}`);
+        const toCell = $(`#${toId}`);
+        const piece = fromCell.text();
+        const color = getColor(piece);
+
+        if (piece && color === turn) {
+          toCell.text(piece);
+          fromCell.text('');
+          switchTurn();
+        }
+      } else if (parts[0] === 'reset') {
+        resetBoard();
+      }
+
+      cli.val('');
+    }
+  });
+
+  $('body').contextmenu(function (e) {
+    e.preventDefault();
+  });
 });
+
 

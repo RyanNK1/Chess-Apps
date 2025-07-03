@@ -34,4 +34,45 @@ body {
 
 #turn {
   font-size: 18px;
+  margin-bottom: 10px;
 }
+
+#cli {
+  width: 480px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.highlight {
+  background-color: rgb(65, 161, 73) !important;
+}
+
+.turnhighlight {
+  background: #5cb85c !important;
+  color: #fff;
+}
+
+.shake-little {
+  animation-name: shake-little;
+  animation-duration: 100ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.neongreen_txt {
+  animation: neonGreenText 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neonGreenText {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #b6ff00,
+      0 0 70px #b6ff00, 0 0 80px #b6ff00, 0 0 100px #b6ff00, 0 0 150px #b6ff00;
+  }
+  to {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #b6ff00,
+      0 0 35px #b6ff00, 0 0 40px #b6ff00, 0 0 50px #b6ff00, 0 0 75px #b6ff00;
+  }
+}
+

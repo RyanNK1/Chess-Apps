@@ -1,4 +1,5 @@
 let legalSquares = [];
+let isWhiteTurn=true;
 const boardSquares = document.getElementsByClassName("square");
 const pieces = document.getElementsByClassName("piece");
 const piecesImages = document.getElementsByTagName("img")
@@ -31,7 +32,9 @@ function allowDrop(ev){
 }
 function drag(ev){
     const piece=ev.target;
-    ev.dataTransfer.setData("text", piece.id);
+    const pieceColor = piece.getAttribute("color");
+    if((isWhiteTurn && pieceColor == "white")||( !isWhiteTurn && pieceColor == "black"))
+        ev.dataTransfer.setData("text", piece.id);
 }
 function drop(ev){
     ev.preventDefault();
@@ -39,7 +42,29 @@ function drop(ev){
     const piece = document.getElementById(data);
     const destinationSquare = ev.currentTarget;
     let destinationSquareId = destinationSquare.id;
-    destinationSquare.appendChild(piece);
+    if (isSquareOccupied(destinationSquare)=="blank"){
+        destinationSquare.appendChild(piece);
+        isWhiteTurn=!isWhiteTurn;
+        return
+    }
+    if (isSquareOccupied(destinationSquare)!="blank"){
+        while(destinationSquare.firstChild){
+            destinationSquare.removeChild(destinationSquare.firstChild);
+        }
+        destinationSquare.appendChild(piece);
+        isWhiteTurn=!isWhiteTurn;
+        return
+    }
+    
+}
+function isSquareOccupied(square){
+    if(square.querySelector(".piece")){
+        const color = square.querySelector(".piece").getAttribute("color");
+        return color;
+    } else {
+        return "blank";
+    }
+
 }
 
 

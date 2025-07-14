@@ -33,8 +33,13 @@ function allowDrop(ev){
 function drag(ev){
     const piece=ev.target;
     const pieceColor = piece.getAttribute("color");
-    if((isWhiteTurn && pieceColor == "white")||( !isWhiteTurn && pieceColor == "black"))
+    if((isWhiteTurn && pieceColor == "white")||( !isWhiteTurn && pieceColor == "black")){
+
         ev.dataTransfer.setData("text", piece.id);
+        const startingSquareId = piece.parentNode.id;
+        getPossibleMoves(startingSquareId,piece);
+
+    }
 }
 function drop(ev){
     ev.preventDefault();
@@ -42,20 +47,27 @@ function drop(ev){
     const piece = document.getElementById(data);
     const destinationSquare = ev.currentTarget;
     let destinationSquareId = destinationSquare.id;
-    if (isSquareOccupied(destinationSquare)=="blank"){
+    if ((isSquareOccupied(destinationSquare)=="blank")&&(legalSquares.includes(destinationSquareId))){
         destinationSquare.appendChild(piece);
         isWhiteTurn=!isWhiteTurn;
+        legalSquares.length=0;
         return
     }
-    if (isSquareOccupied(destinationSquare)!="blank"){
+    if ((isSquareOccupied(destinationSquare)!="blank")&&(legalSquares.includes(destinationSquareId))){
         while(destinationSquare.firstChild){
             destinationSquare.removeChild(destinationSquare.firstChild);
         }
         destinationSquare.appendChild(piece);
         isWhiteTurn=!isWhiteTurn;
+        legalSquares.length=0;
         return
     }
-    
+}
+function getPossibleMoves(startingSquareId, piece){
+    const pieceColor= piece.getAttribute("color");
+    if (piece.classList.contains("pawn")){
+        getPawnMoves(startingSquareId, pieceColor);
+    }
 }
 function isSquareOccupied(square){
     if(square.querySelector(".piece")){
@@ -64,7 +76,59 @@ function isSquareOccupied(square){
     } else {
         return "blank";
     }
+}
+function getPawnMoves(startingSquareId, pieceColor){
+    checkPawnDiagonalCaptures(startingSquareId, pieceColor);
+    checkPawnFowardMoves(startingSquareId, pieceColor);
+}
+function checkPawnDiagonalCaptures(startingSquareId, pieceColor){
+    const file = startingSquareId.charAt(0);
+    const rank = startingSquareId.charAt(1);
+    const rankNumber = parseInt(rank);
+    let currentFile = file;
+    let currentRank = rankNumber;
+    let currentSquareId = currentFile+currentRank;
+    let currentSquare = document.getElementById(currentSquareId)
+    let squareContent = isSquareOccupied(currentSquare);
+    const direction = pieceColor == "white"? 1:-1;
 
+    currentRank += direction;
+    for (let i=-1; i<=1;i+=2){
+        currentFile = String.fromCharCode(file.charCodeAt(0)+i);
+        if(currentFile>="a"&& currentFile<="h"){
+            currentSquareId=currentFile+currentRank;
+            currentSquare = document.getElementById(currentSquareId);
+            squareContent = isSquareOccupied(currentSquare);
+            if(squareContent != "blank" && squareContent != pieceColor)
+                legalSquares.push(currentSquareId);
+        }
+    }
+}
+function checkPawnFowardMoves(startingSquareId, pieceColor){
+    const file = startingSquareId.charAt(0);
+    const rank = startingSquareId.charAt(1);
+    const rankNumber = parseInt(rank);
+    let currentFile = file;
+    let currentRank = rankNumber;
+    let currentSquareId = currentFile+currentRank;
+    let currentSquare = document.getElementById(currentSquareId)
+    let squareContent = isSquareOccupied(currentSquare);
+    const direction = pieceColor == "white"? 1:-1;
+    currentRank += direction;
+    currentSquareId=currentFile+currentRank;
+    currentSquare = document.getElementById(currentSquareId);
+    squareContent = isSquareOccupied(currentSquare);
+    if(squareContent != "blank")
+        return;
+        legalSquares.push(currentSquareId);
+        if (rankNumber!=2 && rankNumber!=7) return;
+        currentRank += direction;
+        currentSquareId=currentFile+currentRank;
+        currentSquare = document.getElementById(currentSquareId);
+        squareContent = isSquareOccupied(currentSquare);
+        if(squareContent != "blank")
+            return;
+            legalSquares.push(currentSquareId);
 }
 
 

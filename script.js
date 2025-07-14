@@ -77,6 +77,9 @@ function getPossibleMoves(startingSquareId, piece){
     if (piece.classList.contains("bishop")){
         getBishopMoves(startingSquareId, pieceColor);
     }
+    if (piece.classList.contains("queen")){
+        getQueenMoves(startingSquareId, pieceColor);
+    }
 }
 function isSquareOccupied(square){
     if(square.querySelector(".piece")){
@@ -172,6 +175,17 @@ function getRookMoves(startingSquareId, pieceColor){
 }
 
 function getBishopMoves(startingSquareId, pieceColor){
+    moveToEighthRankHFile(startingSquareId, pieceColor);
+    moveToEighthRankAFile(startingSquareId, pieceColor);
+    moveToFirstRankHFile(startingSquareId, pieceColor);
+    moveToFirstRankAFile(startingSquareId, pieceColor);
+}
+
+function getQueenMoves(startingSquareId, pieceColor){
+    moveToEighthRank(startingSquareId,pieceColor);
+    moveToFirstRank(startingSquareId, pieceColor);
+    moveToAFile(startingSquareId, pieceColor);
+    moveToHFile(startingSquareId, pieceColor);
     moveToEighthRankHFile(startingSquareId, pieceColor);
     moveToEighthRankAFile(startingSquareId, pieceColor);
     moveToFirstRankHFile(startingSquareId, pieceColor);
